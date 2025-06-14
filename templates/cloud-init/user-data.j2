@@ -7,7 +7,7 @@ autoinstall:
     password: "{{ vm_user_password_hash }}"
   ssh:
     install-server: yes
-    allow-pw: yes
+    allow-pw: no
     authorized-keys:
       - {{ vm_ssh_public_key }}
   storage:
