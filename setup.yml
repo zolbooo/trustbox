@@ -1,0 +1,70 @@
+---
+- name: Setup trustbox builder instance
+  hosts: all
+  tasks:
+    - name: Validate SSH public key
+      ansible.builtin.assert:
+        that:
+          - ansible_ssh_public_key.startswith('ssh-rsa')
+        fail_msg: SSH public key must start with 'ssh-rsa', as it's used for Dropbear SSH server during the boot.
+    - name: Add Hashicorp GPG key
+      become: true
+      apt_key:
+        url: "https://apt.releases.hashicorp.com/gpg"
+        state: present
+    - name: Add Hashicorp APT repository
+      become: true
+      apt_repository:
+        repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        state: present
+    - name: Update apt cache
+      become: true
+      apt:
+        update_cache: yes
+    - name: Install necessary packages
+      become: true
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - qemu-system-x86
+        - packer
+        - cloud-image-utils
+        - whois
+        - vde2
+    - name: Create directory for ISO files
+      become: true
+      file:
+        path: /opt/trustbox
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0755"
+    - name: Download Ubuntu Server 24.04 ISO
+      become: true
+      get_url:
+        url: https://releases.ubuntu.com/noble/ubuntu-24.04.2-live-server-amd64.iso
+        checksum: sha256:d6dab0c3a657988501b4bd76f1297c053df710e06e0c3aece60dead24f270b4d
+        dest: /opt/trustbox/ubuntu-24.04.2-live-server-amd64.iso
+        mode: "0644"
+    - name: Create cloud-init configuration directory
+      file:
+        path: /opt/trustbox/cloud-init
+        state: directory
+    - name: Copy cloud-init meta-data
+      copy:
+        src: files/cloud-init/meta-data
+        dest: /opt/trustbox/cloud-init/
+        mode: "0644"
+    - name: Hash VM user password
+      command: mkpasswd --method=sha-512 {{ vm_user_password }}
+      register: hashed_password
+    - name: Prepare cloud-init user-data
+      vars:
+        vm_user_password_hash: "{{ hashed_password.stdout }}"
+      template:
+        src: templates/cloud-init/user-data.j2
+        dest: /opt/trustbox/cloud-init/user-data
+        mode: "0644"
+    - name: Create cloud-init ISO
+      command: cloud-localds -v /opt/trustbox/cloud-init.iso /opt/trustbox/cloud-init/user-data /opt/trustbox/cloud-init/meta-data

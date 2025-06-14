@@ -1,0 +1,8 @@
+all:
+  vars:
+    vm_disk_password: "{{ lookup('password', 'secrets/vm_disk_password', length=24) }}"
+    vm_user_password: "{{ lookup('password', 'secrets/vm_user_password', length=24) }}"
+    vm_ssh_public_key: "{{ lookup('file', 'files/server_pubkey') }}"
+  hosts:
+    54.169.53.25:
+      ansible_user: ubuntu

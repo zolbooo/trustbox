@@ -1,0 +1,22 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: ubuntu-trustbox
+    username: ubuntu
+    password: "{{ vm_user_password_hash }}"
+  ssh:
+    install-server: yes
+    allow-pw: yes
+    authorized-keys:
+      - {{ vm_ssh_public_key }}
+  storage:
+    layout:
+      name: lvm
+      password: "{{ vm_disk_password }}"
+  late-commands:
+    - curtin in-target -- apt update
+    - curtin in-target -- apt install -y dropbear-initramfs
+    - echo {{ vm_ssh_public_key }} > /target/etc/dropbear/initramfs/authorized_keys
+    - sed -i 's/#DROPBEAR_OPTIONS=""/DROPBEAR_OPTIONS="-I 180 -j -k -p 22 -s -c cryptroot-unlock"/' /target/etc/dropbear/initramfs/dropbear.conf
+    - curtin in-target -- update-initramfs -u
