@@ -5,6 +5,7 @@ autoinstall:
     hostname: ubuntu-trustbox
     username: ubuntu
     password: "{{ vm_user_password_hash }}"
+  timezone: "{{ vm_timezone }}"
   ssh:
     install-server: yes
     allow-pw: no
