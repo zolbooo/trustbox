@@ -5,7 +5,6 @@ all:
     vm_timezone: Asia/Ulaanbaatar
     vm_disk_password: "{{ lookup('password', 'secrets/vm_disk_password', length=24) }}"
     vm_user_password: "{{ lookup('password', 'secrets/vm_user_password', length=24) }}"
-    vm_ssh_public_key: "{{ lookup('file', 'files/server_pubkey') }}"
   hosts:
-    3.0.146.217:
+    13.212.235.146:
       ansible_user: ubuntu
