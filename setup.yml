@@ -27,6 +27,7 @@
         name:
           - qemu-system-x86
           - packer
+          - tmux
         state: present
     - name: Create directory for Trustbox
       become: true
@@ -59,7 +60,7 @@
         mode: "0644"
     - name: Prepare Packer template
       template:
-        src: templates/packer/trustbox.pkr.hcl
+        src: templates/packer/vm.pkr.hcl.j2
         dest: /opt/trustbox/vm.pkr.hcl
         mode: "0644"
     - name: Install Packer plugins

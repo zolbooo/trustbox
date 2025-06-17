@@ -7,6 +7,9 @@ source "qemu" "trustbox" {
   format = "raw"
   display = "vnc=:0"
 
+  cpus = 94
+  memory = {{ 190 * 1024 }}
+
   http_directory = "cloud-init"
   boot_wait    = "1s"
   boot_command = [
