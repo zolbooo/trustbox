@@ -1,5 +1,4 @@
 source "qemu" "trustbox" {
-  name         = "trustbox"
   accelerator  = "none"
   communicator = "none"
 
