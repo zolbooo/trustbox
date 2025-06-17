@@ -23,4 +23,3 @@ autoinstall:
     - echo {{ vm_ssh_public_key }} > /target/etc/dropbear/initramfs/authorized_keys
     - sed -i 's/#DROPBEAR_OPTIONS=""/DROPBEAR_OPTIONS="-I 180 -j -k -p 22 -s -c cryptroot-unlock"/' /target/etc/dropbear/initramfs/dropbear.conf
     - curtin in-target -- update-initramfs -u
-  shutdown: poweroff
