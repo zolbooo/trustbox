@@ -27,7 +27,6 @@
         name:
           - qemu-system-x86
           - packer
-          - cloud-image-utils
         state: present
     - name: Create directory for Trustbox
       become: true
@@ -58,12 +57,10 @@
         src: templates/cloud-init/user-data.j2
         dest: /opt/trustbox/cloud-init/user-data
         mode: "0644"
-    - name: Create cloud-init ISO
-      command: cloud-localds -v /opt/trustbox/cloud-init.iso /opt/trustbox/cloud-init/user-data /opt/trustbox/cloud-init/meta-data
     - name: Prepare Packer template
       template:
         src: templates/packer/trustbox.pkr.hcl
-        dest: /opt/trustbox/build.pkr.hcl
+        dest: /opt/trustbox/vm.pkr.hcl
         mode: "0644"
     - name: Install Packer plugins
       command: packer plugins install github.com/hashicorp/qemu

@@ -1,17 +1,25 @@
 source "qemu" "trustbox" {
-  accelerator  = "none"
-  communicator = "none"
+  accelerator  = "kvm"
 
   iso_checksum = "{{ iso_checksum }}"
   iso_url      = "{{ iso_url }}"
 
-  cd_files = ["/opt/trustbox/cloud-init.iso"]
-  cd_label = "cloud-init"
+  format = "raw"
+  display = "vnc=:0"
 
-  boot_wait    = "10s"
-  boot_command = ["e"]
+  http_directory = "cloud-init"
+  boot_wait    = "1s"
+  boot_command = [
+    "c<wait>linux /casper/vmlinuz autoinstall 'ds=nocloud;s=http://{{ '{{ .HTTPIP }}:{{ .HTTPPort }}' }}/' ---<enter><wait>", # Escape braces
+    "initrd /casper/initrd<enter><wait><wait>",
+    "boot<enter><wait>"
+  ]
+
+  ssh_username = "root"
+  ssh_timeout = "3h"
 }
 
 build {
+  name = "trustbox"
   sources = ["source.qemu.trustbox"]
 }
