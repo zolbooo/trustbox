@@ -58,3 +58,7 @@
         src: templates/packer/trustbox.pkr.hcl
         dest: /opt/trustbox/build.pkr.hcl
         mode: "0644"
+    - name: Install Packer plugins
+      command: packer plugins install github.com/hashicorp/qemu
+      args:
+        chdir: /opt/trustbox
