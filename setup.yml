@@ -28,7 +28,6 @@
           - qemu-system-x86
           - packer
           - cloud-image-utils
-          - whois # Used for mkpasswd
         state: present
     - name: Create directory for ISO files
       become: true
@@ -47,19 +46,13 @@
         src: files/cloud-init/meta-data
         dest: /opt/trustbox/cloud-init/
         mode: "0644"
-    - name: Hash VM user password
-      command: mkpasswd --method=sha-512 {{ vm_user_password }}
-      no_log: true
-      register: hashed_password
     - name: Prepare cloud-init user-data
-      vars:
-        vm_user_password_hash: "{{ hashed_password.stdout }}"
       template:
         src: templates/cloud-init/user-data.j2
         dest: /opt/trustbox/cloud-init/user-data
         mode: "0644"
     - name: Create cloud-init ISO
-      command: cloud-localds -v /opt/trustbox/cloud-init.iso /opt/trustbox/cloud-init/user-data /opt/trustbox/cloud-init/meta-data
+      command: cloud-localds -v /opt/trustbox/cloud-init.iso /opt/trustbox/cloud-init/user-data /opt/trustbox/cloud-init/meta-data && shred /opt/trustbox/cloud-init/user-data
     - name: Prepare Packer template
       template:
         src: templates/packer/trustbox.pkr.hcl
