@@ -4,7 +4,7 @@ source "qemu" "trustbox" {
   iso_checksum = "{{ iso_checksum }}"
   iso_url      = "{{ iso_url }}"
 
-  format = "raw"
+  format = "qcow2"
   display = "vnc=:0"
 
   cpus = 94
