@@ -1,5 +1,5 @@
 source "qemu" "trustbox" {
-  accelerator  = "kvm"
+  accelerator  = "{{ vm_accelerator }}"
 
   iso_checksum = "{{ iso_checksum }}"
   iso_url      = "{{ iso_url }}"

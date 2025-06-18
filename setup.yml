@@ -23,7 +23,20 @@
           - qemu-system-x86
           - packer
           - tmux
+          - cpu-checker # For kvm-ok command
         state: present
+    - name: Check if KVM is available
+      become: true
+      command: kvm-ok
+      register: kvm_check
+      ignore_errors: true
+    - name: Add user to kvm group if KVM is available
+      become: true
+      user:
+        name: "{{ ansible_user }}"
+        groups: kvm
+        append: yes
+      when: kvm_check.rc == 0
     - name: Create directory for Trustbox
       become: true
       file:
@@ -54,6 +67,8 @@
         dest: /opt/trustbox/cloud-init/user-data
         mode: "0644"
     - name: Prepare Packer template
+      vars:
+        vm_accelerator: "{{ 'kvm' if kvm_check.rc == 0 else 'none' }}"
       template:
         src: templates/packer/vm.pkr.hcl.j2
         dest: /opt/trustbox/vm.pkr.hcl
