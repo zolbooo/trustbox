@@ -19,7 +19,8 @@ source "qemu" "trustbox" {
   ]
 
   ssh_username = "root"
-  ssh_timeout = "3h"
+  ssh_timeout = "10m"
+  ssh_private_key_file = "id_rsa"
 }
 
 build {
